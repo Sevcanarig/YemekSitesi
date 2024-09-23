@@ -1,0 +1,33 @@
+@model IEnumerable<YemekTarifiApp.ViewModels.YemekViewModel>
+
+
+@{
+    ViewData["Title"] = "Yemek Listesi";
+}
+
+<h2>Yemek Listesi</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ad</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Ad</td>
+            <td>
+                <a asp-action="Detay" asp-route-id="@item.Id">Detay</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Sil</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+<a asp-action="Ekle" class="btn btn-primary">Yeni Yemek Ekle</a>

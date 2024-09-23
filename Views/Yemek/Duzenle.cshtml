@@ -1,0 +1,48 @@
+@model YemekTarifiApp.ViewModels.YemekViewModel
+
+<h2>Yemek Düzenle</h2>
+
+<form asp-action="Duzenle" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label for="Ad">Yemek Adı</label>
+        <input asp-for="Ad" class="form-control" />
+        <span asp-validation-for="Ad" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Yapilis">Yapılış</label>
+        <textarea asp-for="Yapilis" class="form-control"></textarea>
+        <span asp-validation-for="Yapilis" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="ResimDosya">Yemek Resmi</label>
+        <input asp-for="ResimDosya" type="file" class="form-control" />
+        <span asp-validation-for="ResimDosya" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Mevcut Malzemeler:</label>
+        <ul>
+            @foreach (var malzeme in Model.MalzemeEklendi)
+            {
+                <li>@malzeme.Ad - @malzeme.Miktar</li>
+            }
+        </ul>
+    </div>
+
+    <div class="form-group">
+        <label for="SelectedMalzemeler">Malzemeler Ekle</label>
+        <select asp-for="SelectedMalzemeler" class="form-control" multiple>
+            @foreach (var malzeme in Model.Malzemeler)
+            {
+                <option value="@malzeme.Id">@malzeme.Ad</option>
+            }
+        </select>
+        <span asp-validation-for="SelectedMalzemeler" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Kaydet</button>
+</form>

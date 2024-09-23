@@ -1,0 +1,164 @@
+@model YemekTarifiApp.ViewModels.YemekViewModel
+<style>
+body {
+    background-image: url('/Img/arkaplan.jpg'); /* Arka plan resmi */
+    background-size: cover; /* Resmi tam kapsama */
+    background-position: center; /* Merkezleme */
+    font-family: Arial, sans-serif; /* Yazı tipi */
+}
+
+.form-container {
+    background-color: rgba(255, 255, 255, 0.8); /* Beyaz arka plan, yarı saydam */
+    padding: 30px;
+    border-radius: 10px; /* Kenar yuvarlama */
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Hafif bir kenar çizgisi ekledik */
+    max-width: 600px;
+    margin: auto; /* Ortalamak için */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hafif gölge efekti */
+}
+
+h2 {
+    color: #4a4a4a; /* Başlık rengi */
+    text-align: center; /* Ortala */
+}
+
+.btn-primary {
+    background-color: #9dd7ca; /* Pastel yeşil */
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px; /* Kenar yuvarlama */
+    cursor: pointer; /* Fare işareti değişimi */
+    transition: background-color 0.3s; /* Geçiş efekti */
+}
+
+.btn-primary:hover {
+    background-color: #b0e0e6; /* Fare ile üzerine gelince rengi değişir */
+}
+
+.btn-back {
+    background-color: #dc143c; /* Pastel pembe */
+    font-size: 0.9rem; /* Yazı boyutunu artırdık */
+    padding: 8px 15px; /* İç boşlukları artırdık */
+    border-radius: 5px; /* Kenar yuvarlama */
+}
+
+.btn-back:hover {
+    background-color: #751414; /* Fare ile üzerine gelince rengi değişir */
+}
+
+.text-danger {
+    color: #dc3545; /* Hata mesajı rengi */
+}
+
+.text-right {
+    text-align: right; /* Sağa hizalama */
+}
+</style>
+
+<div class="form-container">
+    <h2>Yeni Yemek Ekle</h2>
+
+    <form asp-action="Ekle" asp-controller="Yemek" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label asp-for="Ad" class="control-label">Yemek Adı:</label>
+            <input asp-for="Ad" class="form-control form-control-lg" required />
+            <span asp-validation-for="Ad" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Yapilis" class="control-label">Yapılışı:</label>
+            <textarea asp-for="Yapilis" class="form-control form-control-lg" required></textarea>
+            <span asp-validation-for="Yapilis" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ResimDosya" class="control-label">Resim Dosyası:</label>
+            <input asp-for="ResimDosya" type="file" class="form-control" />
+            <span asp-validation-for="ResimDosya" class="text-danger"></span>
+        </div>
+
+        <h3>Malzemeler</h3>
+
+        <div class="form-group">
+            <label for="malzemeAdi" class="control-label">Malzeme Adı:</label>
+            <input type="text" id="malzemeAdi" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="malzemeMiktari" class="control-label">Malzeme Miktarı:</label>
+            <input type="text" id="malzemeMiktari" class="form-control" />
+        </div>
+
+        <button type="button" id="malzemeEkle" class="btn btn-primary btn-lg">Malzeme Ekle</button>
+
+        <div id="malzemelerListesi" class="mt-3">
+            <!-- Seçilen malzemelerin listeleneceği alan -->
+        </div>
+
+        <input type="hidden" id="malzemeEklendiData" name="MalzemeEklendiJson" />
+
+        <button type="submit" class="btn btn-primary btn-lg mt-3">Ekle</button>
+    </form>
+
+    <div class="text-right mt-3"> <!-- Sağ hizalama için yeni bir div -->
+        <a asp-action="Index" asp-controller="Yemek" class="btn btn-back btn-sm">Geri Dön</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var malzemelerListesi = [];
+
+            $("#malzemeEkle").click(function () {
+                var malzemeAdi = $("#malzemeAdi").val();
+                var malzemeMiktari = $("#malzemeMiktari").val();
+
+                if (malzemeAdi && malzemeMiktari) {
+                    // Mevcut malzemelerle aynı adı kontrol et
+                    if (malzemelerListesi.some(m => m.Ad === malzemeAdi)) {
+                        alert("Bu malzeme zaten eklenmiş!");
+                        return;
+                    }
+
+                    malzemelerListesi.push({ Ad: malzemeAdi, Miktar: malzemeMiktari });
+                    var malzemeHtml = `
+                        <div class="mb-2">
+                            <span class="badge badge-secondary">${malzemeAdi} - ${malzemeMiktari}</span>
+                            <button type="button" class="btn btn-danger btn-sm ml-2" onclick="removeMalzeme(this)">Sil</button>
+                        </div>
+                    `;
+                    $("#malzemelerListesi").append(malzemeHtml);
+
+                    // Gizli input alanını JSON verisi ile güncelle
+                    $("#malzemeEklendiData").val(JSON.stringify(malzemelerListesi));
+
+                    // Giriş alanlarını temizle
+                    $("#malzemeAdi").val('');
+                    $("#malzemeMiktari").val('');
+                } else {
+                    alert("Lütfen malzeme adı ve miktarını girin.");
+                }
+            });
+        });
+
+        function removeMalzeme(button) {
+            // Seçilen malzemeyi listeden kaldır
+            $(button).parent().remove();
+            // Kaldırmadan sonra gizli input alanını güncelle
+            updateMalzemelerListesi();
+        }
+
+        function updateMalzemelerListesi() {
+            var malzemeler = [];
+            $("#malzemelerListesi").find(".mb-2").each(function () {
+                var badgeText = $(this).text();
+                var parts = badgeText.split(' - ');
+                if (parts.length === 2) {
+                    malzemeler.push({ Ad: parts[0], Miktar: parts[1] });
+                }
+            });
+            $("#malzemeEklendiData").val(JSON.stringify(malzemeler));
+        }
+    </script>
+}

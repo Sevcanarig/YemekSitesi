@@ -1,0 +1,19 @@
+@model YemekTarifiApp.Models.Yemek
+
+@{
+    ViewData["Title"] = "Yemek Sil";
+}
+
+<div class="form-container">
+    <h2>Yemek Sil</h2>
+    <h3>@Model.Ad</h3>
+
+    <p>Bu yemeği silmek istediğinize emin misiniz?</p>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Sil</button>
+        <a asp-action="Index" class="btn btn-secondary">İptal</a>
+    </form>
+</div>
+
